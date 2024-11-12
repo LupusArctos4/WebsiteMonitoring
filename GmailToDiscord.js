@@ -14,10 +14,34 @@ function checkEmails() {
       }
       
       var subject = message.getSubject();
-      
-      // Create payload for Discord
+      var body = message.getPlainBody();
+      // Divide the body into lines
+      var lines = body.split('\n');
+
+      // Check that there are at least two lines
+      if (lines.length >= 2) {
+        var secondLine = lines[1];
+        
+        // Find the position of the string '<You>can unsubscribe'
+        var marker = '<You>can unsubscribe';
+        var index = secondLine.indexOf(marker);
+        
+        // Extract text before marker
+        var desiredText;
+        if (index !== -1) {
+          desiredText = secondLine.substring(0, index);
+        } else {
+          // If marker not found, use entire line
+          desiredText = secondLine;
+        }
+      } else {
+        // If there is no second line, define desiredText as empty or a default message
+        var desiredText = '';
+      }
+
+       // Create payload for Discord
       var payload = {
-        "content": "# " + subject + "\n <@ID_DISCORD>" // !!!!!!!!!!!!!!
+        "content": "# " + subject + "\n <@ID_DISCORD>\n" + desiredText // !!!!!!!!!!!!!!
       };
       
       var options = {
