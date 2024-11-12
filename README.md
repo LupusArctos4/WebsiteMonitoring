@@ -55,10 +55,34 @@ This project demonstrates how to monitor changes on a website using Distill Web 
          }
          
          var subject = message.getSubject();
-         
+         var body = message.getPlainBody();
+         // Divide the body into lines
+         var lines = body.split('\n');
+   
+         // Check that there are at least two lines
+         if (lines.length >= 2) {
+           var secondLine = lines[1];
+           
+           // Find the position of the string '<You>can unsubscribe'
+           var marker = '<You>can unsubscribe';
+           var index = secondLine.indexOf(marker);
+           
+           // Extract text before marker
+           var desiredText;
+           if (index !== -1) {
+             desiredText = secondLine.substring(0, index);
+           } else {
+             // If marker not found, use entire line
+             desiredText = secondLine;
+           }
+         } else {
+           // If there is no second line, define desiredText as empty or a default message
+           var desiredText = '';
+         }
+   
          // Create payload for Discord
          var payload = {
-           "content": "# " + subject + "\n <@ID_DISCORD>" // !!!!!!!!!!!!!!
+           "content": "# " + subject + "\n <@ID_DISCORD>\n" + desiredText // !!!!!!!!!!!!!!
          };
          
          var options = {
@@ -127,9 +151,9 @@ Ce projet montre comment surveiller les changements d'un site web en utilisant D
 
    ```javascript
    function checkEmails() {
-     var webhookUrl = "URL_WEBHOOK_DISCORD"; // !!!!!!!!!!!!!!
-     var query = 'from:alert@distill.io is:unread'; // Configuré pour Distill Web Monitor
-     var threads = GmailApp.search(query, 0, 5);
+     var webhookUrl = "https://discord.com/api/webhooks/";
+     var query = 'from:alert@distill.io is:unread'; // Modifier l'adresse e-mail si nécessaire
+     var threads = GmailApp.search(query, 0, 5); // Vous pouvez ajuster le nombre d'e-mails à vérifier
      
      for (var i = 0; i < threads.length; i++) {
        var thread = threads[i];
@@ -138,14 +162,38 @@ Ce projet montre comment surveiller les changements d'un site web en utilisant D
        for (var j = 0; j < messages.length; j++) {
          var message = messages[j];
          if (!message.isUnread()) {
-           continue; // Ignorer les messages lus
+           continue; // Ignorer les messages déjà lus
          }
          
          var subject = message.getSubject();
-         
-         // Créer la charge utile pour Discord
+         var body = message.getPlainBody();
+         // Diviser le corps en lignes
+         var lines = body.split('\n');
+   
+         // Vérifier s'il y a au moins deux lignes
+         if (lines.length >= 2) {
+           var secondLine = lines[1];
+           
+           // Trouver la position de la chaîne '<You>can unsubscribe'
+           var marker = '<You>can unsubscribe';
+           var index = secondLine.indexOf(marker);
+           
+           // Extraire le texte avant le marqueur
+           var desiredText;
+           if (index !== -1) {
+             desiredText = secondLine.substring(0, index);
+           } else {
+             // Si le marqueur n'est pas trouvé, utiliser toute la ligne
+             desiredText = secondLine;
+           }
+         } else {
+           // S'il n'y a pas de seconde ligne, définir desiredText comme vide ou un message par défaut
+           var desiredText = '';
+         }
+   
+         // Créer le payload pour Discord
          var payload = {
-           "content": "# " + subject + "\n <@ID_DISCORD>" // !!!!!!!!!!!!!!
+           "content": "# " + subject + "\n<@299948231259979778>\n" + desiredText
          };
          
          var options = {
